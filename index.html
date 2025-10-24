@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КС-251 — Zoom уроки</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('https://i.postimg.cc/L8ZrFW6Z/b5085809d0aa1c6d263d9e3722aed869.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    color: white;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Размытый фон */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: blur(12px) brightness(0.6);
+    z-index: -1;
+  }
+
+  h1 {
+    margin-top: 2rem;
+    font-size: 3rem;
+    text-align: center;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
+  }
+
+  .search-container {
+    margin: 2rem 0;
+    width: 90%;
+    max-width: 600px;
+  }
+
+  #search {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 1rem;
+    backdrop-filter: blur(8px);
+  }
+
+  #search::placeholder {
+    color: rgba(255,255,255,0.7);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    width: 90%;
+    max-width: 1200px;
+    margin-bottom: 3rem;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 1.8rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 180px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.25);
+    perspective: 1000px;
+  }
+
+  .card:hover {
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+  }
+
+  .card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .card-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    text-align: center;
+    font-size: 1rem;
+    backdrop-filter: blur(5px);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .card-button:hover {
+    background: rgba(255,255,255,0.35);
+    transform: scale(1.05);
+  }
+</style>
+</head>
+<body>
+<h1>КС-251 — Zoom уроки</h1>
+<div class="search-container">
+  <input type="text" id="search" placeholder="🔍 Пошук уроку...">
+</div>
+<div class="grid" id="lessons-grid">
+  <!-- Плитки будут добавлены через JS -->
+</div>
+
+<script>
+const lessons = [
+  { title: 'Фізика', link: 'https://us04web.zoom.us/j/2053464868?pwd=SHAzL1kwTmcyYm1PdkdzNVNLNUZ6dz09' },
+  { title: 'Українська мова та література', link: 'https://us05web.zoom.us/j/3571822050?pwd=UnUzdDllQ2tDdlFuUlhhRGhLa2J2QT09' },
+  { title: 'Інформатика', link: 'https://us05web.zoom.us/j/5682632985?pwd=N3UDhppyy3moipTpObJq2Ix92aKkVb.1' },
+  { title: 'ОМЗ (жіноча група)', link: 'https://us04web.zoom.us/j/79517808873?pwd=h5tL0FZbIRWvXuhVy0p2iMUlcuv1mk.1' },
+  { title: 'Зарубіжна література', link: 'https://us04web.zoom.us/j/3794638749?pwd=95anAyy1vVwb04l6XmaTbCHqV2uk8G.1&omn=72250872256' },
+  { title: 'Географія', link: 'https://us04web.zoom.us/j/79517808873?pwd=h5tL0FZbIRWvXuhVy0p2iMUlcuv1mk.1' },
+  { title: 'Захист України', link: 'https://us05web.zoom.us/j/85233699167?pwd=A7cRKTWaDGnANWFYabDDvRAHEaQnIm.1' },
+  { title: 'Історія', link: 'https://us05web.zoom.us/j/6062393199?pwd=wxyBHRBMSbuDtFbjsAdVn2PGi9HW7X.1&omn=81618014952' },
+  { title: 'Хімія та Біологія', link: 'https://us05web.zoom.us/j/3305145414?pwd=RWQ5TmpEMjRaSmNxZ0xSNjZlNStEUT09' },
+  { title: 'Англійська мова', link: 'https://us05web.zoom.us/j/81165574402?pwd=mNOMR0LqScGubCJHMiZqIhoukgvKVN.1' },
+  { title: 'Технології', link: 'https://us05web.zoom.us/j/81896758014?pwd=Wrp8FRREaKwb6apGmvnabdK8kse9ii.1' }
+];
+
+const grid = document.getElementById('lessons-grid');
+
+function createCards(filteredLessons) {
+  grid.innerHTML = '';
+  filteredLessons.forEach(lesson => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const title = document.createElement('div');
+    title.className = 'card-title';
+    title.textContent = lesson.title;
+
+    const button = document.createElement('a');
+    button.className = 'card-button';
+    button.textContent = 'Увійти в конференцію';
+    button.href = lesson.link;
+    button.target = '_blank';
+
+    card.appendChild(title);
+    card.appendChild(button);
+    grid.appendChild(card);
+
+    // Параллакс анимация плитки
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left - rect.width/2) / 10; // чуть сильнее
+      const y = (e.clientY - rect.top - rect.height/2) / 10;
+      card.style.transform = `rotateX(${-y}deg) rotateY(${x}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    });
+  });
+}
+
+createCards(lessons);
+
+document.getElementById('search').addEventListener('input', e => {
+  const filtered = lessons.filter(l => l.title.toLowerCase().includes(e.target.value.toLowerCase()));
+  createCards(filtered);
+});
+</script>
+</body>
+</html>
