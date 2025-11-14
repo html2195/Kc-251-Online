@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>КС-251 — Zoom уроки</title>
+
 <style>
   body {
     margin: 0;
@@ -20,7 +21,7 @@
     position: relative;
   }
 
-  /* Размытый фон */
+  /* Размытый фон — как раньше, без hover-эффекта */
   body::before {
     content: '';
     position: fixed;
@@ -39,8 +40,51 @@
     text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
   }
 
+  /* Вкладки (уроки / пам’ятка) */
+  .nav {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .nav-btn {
+    border: none;
+    padding: 0.4rem 1.1rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    color: #eee;
+    font-size: 0.9rem;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, color 0.2s ease;
+  }
+
+  .nav-btn:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+  }
+
+  .nav-btn.active {
+    background: rgba(255,255,255,0.35);
+    color: #111;
+    font-weight: 600;
+  }
+
+  .page {
+    width: 100%;
+    display: none;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  /* ===== УРОКИ ===== */
+
   .search-container {
-    margin: 2rem 0;
+    margin: 2rem auto 1.5rem auto;
     width: 90%;
     max-width: 600px;
   }
@@ -66,7 +110,7 @@
     gap: 2rem;
     width: 90%;
     max-width: 1200px;
-    margin-bottom: 3rem;
+    margin: 0 auto 3rem auto;
   }
 
   .card {
@@ -111,20 +155,93 @@
     background: rgba(255,255,255,0.35);
     transform: scale(1.05);
   }
+
+  /* ===== ПАМ’ЯТКА ЧЕРГОВОГО ===== */
+
+  .info-container {
+    width: 90%;
+    max-width: 600px;
+    margin: 2.5rem auto 3rem auto;
+  }
+
+  /* это та же стеклянная карточка, просто чуть другая начинка */
+  .memo-card {
+    align-items: flex-start;
+    height: auto;
+    padding: 1.4rem 1.8rem;
+    row-gap: 0.4rem;
+    border: 1px solid rgba(255,255,255,0.35);
+  }
+
+  /* небольшая «нотка» — маленький бейдж сверху */
+  .info-badge {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.85;
+    margin-bottom: 0.4rem;
+  }
+
+  .info-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+
+  .info-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .info-text strong {
+    font-weight: 600;
+  }
 </style>
 </head>
+
 <body>
-<h1>КС-251 — Zoom уроки</h1>
-<div class="search-container">
-  <input type="text" id="search" placeholder="🔍 Пошук уроку...">
-</div>
-<div class="grid" id="lessons-grid">
-  <!-- Плитки будут добавлены через JS -->
-</div>
+  <h1>КС-251 — Zoom уроки</h1>
+
+  <nav class="nav">
+    <button class="nav-btn active" data-page="lessons">Уроки</button>
+    <button class="nav-btn" data-page="memo">Пам’ятка чергового</button>
+  </nav>
+
+  <!-- Страница: уроки -->
+  <main id="page-lessons" class="page active">
+    <div class="search-container">
+      <input type="text" id="search" placeholder="🔍 Пошук уроку...">
+    </div>
+
+    <div class="grid" id="lessons-grid">
+      <!-- Плитки добавляются через JS -->
+    </div>
+  </main>
+
+  <!-- Страница: пам’ятка -->
+  <main id="page-memo" class="page">
+    <div class="info-container">
+      <div class="card memo-card">
+        <div class="info-badge">Пам’ятка чергового</div>
+        <div class="info-title">Як доповідати на захисту Вітчизни</div>
+        <div class="info-text">
+          <strong>Команда:</strong> «Встати»<br>
+          <strong>Команда:</strong> «Струнко»<br>
+          <strong>Звернення:</strong> ПАН підполковник!<br><br>
+
+          <strong>Текст доповіді:</strong><br>
+          Група КС-251.<br>
+          В списку стільки-то, в наявності стільки-то.<br>
+          Доповідав черговий групи Прізвище Ім'я.
+        </div>
+      </div>
+    </div>
+  </main>
 
 <script>
 const lessons = [
   { title: 'Фізика', link: 'https://us04web.zoom.us/j/2053464868?pwd=SHAzL1kwTmcyYm1PdkdzNVNLNUZ6dz09' },
+  { title: 'Математика', link: 'https://us04web.zoom.us/j/7750142234?pwd=dmG7lXbFL4fhv2lg28WBocpnwQ6iME.1&omn=71780345956' },
   { title: 'Українська мова та література', link: 'https://us05web.zoom.us/j/3571822050?pwd=UnUzdDllQ2tDdlFuUlhhRGhLa2J2QT09' },
   { title: 'Інформатика', link: 'https://us05web.zoom.us/j/5682632985?pwd=N3UDhppyy3moipTpObJq2Ix92aKkVb.1' },
   { title: 'ОМЗ (жіноча група)', link: 'https://us04web.zoom.us/j/79517808873?pwd=h5tL0FZbIRWvXuhVy0p2iMUlcuv1mk.1' },
@@ -139,8 +256,23 @@ const lessons = [
 
 const grid = document.getElementById('lessons-grid');
 
+/* общая функция параллакса, чтобы использовать и для уроков, и для пам’ятки */
+function addParallax(card) {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left - rect.width / 2) / 10;
+    const y = (e.clientY - rect.top - rect.height / 2) / 10;
+    card.style.transform = `rotateX(${-y}deg) rotateY(${x}deg)`;
+  });
+
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  });
+}
+
 function createCards(filteredLessons) {
   grid.innerHTML = '';
+
   filteredLessons.forEach(lesson => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -159,25 +291,45 @@ function createCards(filteredLessons) {
     card.appendChild(button);
     grid.appendChild(card);
 
-    // Параллакс анимация плитки
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left - rect.width/2) / 10; // чуть сильнее
-      const y = (e.clientY - rect.top - rect.height/2) / 10;
-      card.style.transform = `rotateX(${-y}deg) rotateY(${x}deg)`;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'rotateX(0deg) rotateY(0deg)';
-    });
+    addParallax(card);
   });
 }
 
 createCards(lessons);
 
+/* параллакс для таблички-пам’ятки */
+const memoCard = document.querySelector('.memo-card');
+if (memoCard) {
+  addParallax(memoCard);
+}
+
 document.getElementById('search').addEventListener('input', e => {
-  const filtered = lessons.filter(l => l.title.toLowerCase().includes(e.target.value.toLowerCase()));
+  const filtered = lessons.filter(l =>
+    l.title.toLowerCase().includes(e.target.value.toLowerCase())
+  );
   createCards(filtered);
 });
+
+// переключение вкладок
+const navButtons = document.querySelectorAll('.nav-btn');
+const pages = {
+  lessons: document.getElementById('page-lessons'),
+  memo: document.getElementById('page-memo')
+};
+
+navButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const page = btn.dataset.page;
+
+    navButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    Object.keys(pages).forEach(key => {
+      pages[key].classList.toggle('active', key === page);
+    });
+  });
+});
 </script>
+
 </body>
 </html>
