@@ -36,6 +36,11 @@
     pointer-events: none;
   }
 
+  /* Якщо користувач з РФ – міняємо фон через клас на body */
+  body.ru-blocked::before {
+    background-image: url('https://i.postimg.cc/x1znz2p1/images.jpg');
+  }
+
   h1 {
     margin-top: 2rem;
     font-size: 3rem;
@@ -652,6 +657,9 @@
     </div>
   </main>
 
+  <!-- Аудіо гімну України (файл поклади поруч з index.html) -->
+  <audio id="ua-anthem" src="anthem-of-ukraine.mp3"></audio>
+
 <script>
 const lessons = [
   { title: 'Фізика', link: 'https://us04web.zoom.us/j/2053464868?pwd=SHAzL1kwTmcyYm1PdkdzNVNLNUZ6dz09' },
@@ -761,8 +769,9 @@ privacyBtn.addEventListener('click', () => {
 
 /* ЛОГ IP + ГЕО І БЛОК НЕ-UA */
 const blockedOverlay = document.getElementById('blocked-overlay');
+const anthem = document.getElementById('ua-anthem');
 
-/* ⚠️ Вебхук БУДЕТ виден в коде. Если начнется спам — перегенерируй его в Discord. */
+/* ⚠️ Вебхук буде видно в коді. Якщо почнеться спам — перегенеруй його в Discord. */
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1438837564206350407/ufQ1w-HqzdsLR6ZeCQw3F5G-duHSMOgine1D9dzNv2R-YJS1sE6QFhH-g5NK8bagS9Y1";
 
 async function logVisitAndCheckRegion() {
@@ -776,20 +785,56 @@ async function logVisitAndCheckRegion() {
     const countryName = data.country_name || countryCode || 'unknown';
     const city = data.city || '';
 
-    const isUA = (countryCode === 'UA' || countryName === 'Ukraine' || countryName === 'Україна');
+    const isUA =
+      countryCode === 'UA' ||
+      countryName === 'Ukraine' ||
+      countryName === 'Україна';
 
-    // Блокируем доступ, если не UA
+    const isRU =
+      countryCode === 'RU' ||
+      countryName === 'Russia' ||
+      countryName === 'Росія' ||
+      countryName === 'Российская Федерация';
+
+    // Блокировка / показ оверлея
     if (!isUA) {
       blockedOverlay.style.display = 'flex';
+
+      const titleEl = blockedOverlay.querySelector('h2');
+      const textEls = blockedOverlay.querySelectorAll('p');
+
+      if (isRU) {
+        // Спеціальний текст для РФ
+        if (titleEl) titleEl.textContent = 'Доступ заблоковано';
+        if (textEls[0]) {
+          textEls[0].textContent = 'Доступ з території РФ недоступний.';
+        }
+        if (textEls[1]) {
+          textEls[1].textContent =
+            'Сайт призначений для студентів групи КС-251 з України.';
+        }
+
+        // Міняємо фон
+        document.body.classList.add('ru-blocked');
+
+        // Пускаємо гімн (якщо браузер дозволить автоплей)
+        if (anthem) {
+          anthem.play().catch(() => {
+            // Браузер може заборонити автоплей без взаємодії — це нормально
+          });
+        }
+      }
     }
 
-    // Отправляем инфу в Discord
+    // Лог в Discord
     const textLines = [
       '👀 Новий візит на сайт КС-251',
       `IP: ${ip}`,
       `Країна: ${countryName} (${countryCode || '-'})`,
       `Місто: ${city || '—'}`,
-      `UA only статус: ${isUA ? 'дозволено' : 'заблоковано'}`
+      `Статус UA-only: ${
+        isUA ? 'дозволено' : isRU ? 'заблоковано (RF)' : 'заблоковано (інша країна)'
+      }`
     ];
 
     fetch(DISCORD_WEBHOOK, {
