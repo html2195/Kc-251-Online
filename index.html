@@ -227,6 +227,72 @@
     filter: drop-shadow(0 0 12px rgba(0,0,0,0.7));
   }
 
+  /* БАННЕР ПРО ЗБІР ДАНИХ */
+  .privacy-banner {
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #f5f5f5;
+    font-size: 0.85rem;
+    max-width: 900px;
+    width: calc(100% - 2rem);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .privacy-banner p {
+    margin: 0;
+    flex: 1;
+  }
+
+  .privacy-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    background: rgba(255,255,255,0.8);
+    color: #111;
+    font-weight: 600;
+  }
+
+  /* ОВЕРЛЕЙ ДЛЯ НЕ-UA */
+  .blocked-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 20;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .blocked-box {
+    max-width: 420px;
+    width: 100%;
+    background: rgba(20,20,20,0.9);
+    border-radius: 1.5rem;
+    padding: 1.4rem 1.6rem;
+    border: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+  }
+
+  .blocked-box h2 {
+    margin-top: 0;
+    margin-bottom: 0.6rem;
+    font-size: 1.2rem;
+  }
+
+  .blocked-box p {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 0.3rem 0;
+  }
+
   @media (max-width: 768px) {
     body {
       align-items: stretch;
@@ -358,11 +424,30 @@
 <body>
   <h1>КС-251 — Zoom уроки</h1>
 
+  <!-- Баннер про збір IP -->
+  <div id="privacy-banner" class="privacy-banner">
+    <p>
+      🔒 Цей сайт тимчасово збирає технічні дані (IP-адресу та країну підключення)
+      для підвищення безпеки доступу до Zoom-посилань та обмеження входу з-за меж України.
+      Продовжуючи користування сайтом, ви погоджуєтесь із цими умовами.
+    </p>
+    <button id="privacy-accept" class="privacy-btn">Добре</button>
+  </div>
+
   <nav class="nav">
     <button class="nav-btn active" data-page="lessons">Уроки</button>
     <button class="nav-btn" data-page="memo">Пам’ятка чергового</button>
     <button class="nav-btn" data-page="shpora">Шпори</button>
   </nav>
+
+  <!-- Оверлей для не-UA -->
+  <div id="blocked-overlay" class="blocked-overlay">
+    <div class="blocked-box">
+      <h2>Доступ обмежено</h2>
+      <p>Сайт призначений для використання студентами групи КС-251 з території України.</p>
+      <p>Ваше підключення визначено як з-за меж України, тому доступ до вмісту тимчасово заблоковано.</p>
+    </div>
+  </div>
 
   <!-- Страница: уроки -->
   <main id="page-lessons" class="page active">
@@ -461,7 +546,7 @@
         </div>
       </div>
 
-      <!-- Математика: прогресії (нова шпора) -->
+      <!-- Математика: прогресії -->
       <div class="memo-card">
         <div class="info-badge">Математика</div>
         <div class="info-title">Прогресії</div>
@@ -660,8 +745,67 @@ navButtons.forEach(btn => {
     });
   });
 });
+
+/* БАННЕР ПРО ПРИВАТНІСТЬ */
+const privacyBanner = document.getElementById('privacy-banner');
+const privacyBtn = document.getElementById('privacy-accept');
+
+if (localStorage.getItem('privacyAccepted') === '1') {
+  privacyBanner.style.display = 'none';
+}
+
+privacyBtn.addEventListener('click', () => {
+  privacyBanner.style.display = 'none';
+  localStorage.setItem('privacyAccepted', '1');
+});
+
+/* ЛОГ IP + ГЕО І БЛОК НЕ-UA */
+const blockedOverlay = document.getElementById('blocked-overlay');
+
+/* ⚠️ Вебхук БУДЕТ виден в коде. Если начнется спам — перегенерируй его в Discord. */
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1438837564206350407/ufQ1w-HqzdsLR6ZeCQw3F5G-duHSMOgine1D9dzNv2R-YJS1sE6QFhH-g5NK8bagS9Y1";
+
+async function logVisitAndCheckRegion() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    if (!res.ok) throw new Error('ipapi error');
+    const data = await res.json();
+
+    const ip = data.ip || 'unknown';
+    const countryCode = data.country || '';
+    const countryName = data.country_name || countryCode || 'unknown';
+    const city = data.city || '';
+
+    const isUA = (countryCode === 'UA' || countryName === 'Ukraine' || countryName === 'Україна');
+
+    // Блокируем доступ, если не UA
+    if (!isUA) {
+      blockedOverlay.style.display = 'flex';
+    }
+
+    // Отправляем инфу в Discord
+    const textLines = [
+      '👀 Новий візит на сайт КС-251',
+      `IP: ${ip}`,
+      `Країна: ${countryName} (${countryCode || '-'})`,
+      `Місто: ${city || '—'}`,
+      `UA only статус: ${isUA ? 'дозволено' : 'заблоковано'}`
+    ];
+
+    fetch(DISCORD_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: textLines.join('\n') })
+    }).catch(() => {});
+  } catch (e) {
+    console.error('Geo/IP error', e);
+    // Якщо сервіс впав — просто нічого не блокуємо
+  }
+}
+
+// Запускаем сразу при заходе на сайт
+logVisitAndCheckRegion();
 </script>
 
 </body>
 </html>
-
