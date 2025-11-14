@@ -19,7 +19,7 @@
     position: relative;
   }
 
-  /* Розмитий фон */
+  /* Розмитий фон (для UA та інших) */
   body::before {
     content: '';
     position: fixed;
@@ -36,7 +36,7 @@
     pointer-events: none;
   }
 
-  /* Якщо користувач з РФ – міняємо фон через клас на body */
+  /* Якщо користувач з РФ – міняємо фон через клас на body після блокування */
   body.ru-blocked::before {
     background-image: url('https://i.postimg.cc/x1znz2p1/images.jpg');
   }
@@ -264,7 +264,7 @@
     font-weight: 600;
   }
 
-  /* ОВЕРЛЕЙ ДЛЯ НЕ-UA */
+  /* ОВЕРЛЕЙ ДЛЯ БЛОКУ */
   .blocked-overlay {
     position: fixed;
     inset: 0;
@@ -445,7 +445,7 @@
     <button class="nav-btn" data-page="shpora">Шпори</button>
   </nav>
 
-  <!-- Оверлей для не-UA -->
+  <!-- Оверлей для блокування -->
   <div id="blocked-overlay" class="blocked-overlay">
     <div class="blocked-box">
       <h2>Доступ обмежено</h2>
@@ -650,10 +650,7 @@
 
     <!-- Пасхалка внизу сторінки ШПОР -->
     <div class="easter-egg">
-      <img
-        src="https://i.postimg.cc/qBFDnTHc/pngegg.png"
-        alt="Пасхалка"
-      >
+      <img src="https://i.postimg.cc/qBFDnTHc/pngegg.png" alt="Пасхалка">
     </div>
   </main>
 
@@ -680,7 +677,6 @@ const lessons = [
 const grid = document.getElementById('lessons-grid');
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-/* параллакс (відключено на тач-пристроях) */
 function addParallax(card) {
   if (isTouchDevice) return;
 
@@ -722,8 +718,6 @@ function createCards(filteredLessons) {
 }
 
 createCards(lessons);
-
-/* параллакс для всіх пам’яток/шпор */
 document.querySelectorAll('.memo-card').forEach(card => addParallax(card));
 
 document.getElementById('search').addEventListener('input', e => {
@@ -767,12 +761,40 @@ privacyBtn.addEventListener('click', () => {
   localStorage.setItem('privacyAccepted', '1');
 });
 
-/* ЛОГ IP + ГЕО І БЛОК НЕ-UA */
+/* ЛОГ IP + ГЕО І БЛОК НЕ-UA / RU-клік */
 const blockedOverlay = document.getElementById('blocked-overlay');
 const anthem = document.getElementById('ua-anthem');
 
-/* ⚠️ Вебхук буде видно в коді. Якщо почнеться спам — перегенеруй його в Discord. */
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1438837564206350407/ufQ1w-HqzdsLR6ZeCQw3F5G-duHSMOgine1D9dzNv2R-YJS1sE6QFhH-g5NK8bagS9Y1";
+
+let isRuVisitor = false; // позначка, що юзер з РФ і чекаємо першого кліку
+
+function triggerRuBlock() {
+  if (!isRuVisitor) return;
+  isRuVisitor = false; // щоб не спрацьовувало повторно
+
+  blockedOverlay.style.display = 'flex';
+
+  const titleEl = blockedOverlay.querySelector('h2');
+  const textEls = blockedOverlay.querySelectorAll('p');
+
+  if (titleEl) {
+    titleEl.textContent = 'Доступ заблоковано';
+  }
+  if (textEls[0]) {
+    textEls[0].textContent = 'Доступ з території РФ недоступний.';
+  }
+  if (textEls[1]) {
+    textEls[1].textContent =
+      'Сайт призначений для студентів групи КС-251, які навчаються в Україні.';
+  }
+
+  document.body.classList.add('ru-blocked');
+
+  if (anthem) {
+    anthem.play().catch(() => {});
+  }
+}
 
 async function logVisitAndCheckRegion() {
   try {
@@ -796,34 +818,16 @@ async function logVisitAndCheckRegion() {
       countryName === 'Росія' ||
       countryName === 'Российская Федерация';
 
-    // Блокировка / показ оверлея
-    if (!isUA) {
+    // Логіка доступу:
+    // UA — повний доступ
+    // RU — можна дивитися, але при першому кліку тригериться блок
+    // інші країни — миттєвий блок
+    if (!isUA && !isRU) {
       blockedOverlay.style.display = 'flex';
+    }
 
-      const titleEl = blockedOverlay.querySelector('h2');
-      const textEls = blockedOverlay.querySelectorAll('p');
-
-      if (isRU) {
-        // Спеціальний текст для РФ
-        if (titleEl) titleEl.textContent = 'Доступ заблоковано';
-        if (textEls[0]) {
-          textEls[0].textContent = 'Кацапам тут не место русский военный корабль иди... ';
-        }
-        if (textEls[1]) {
-          textEls[1].textContent =
-            'Сайт призначений для студентів групи КС-251 з України.';
-        }
-
-        // Міняємо фон
-        document.body.classList.add('ru-blocked');
-
-        // Пускаємо гімн (якщо браузер дозволить автоплей)
-        if (anthem) {
-          anthem.play().catch(() => {
-            // Браузер може заборонити автоплей без взаємодії — це нормально
-          });
-        }
-      }
+    if (isRU) {
+      isRuVisitor = true;
     }
 
     // Лог в Discord
@@ -833,7 +837,11 @@ async function logVisitAndCheckRegion() {
       `Країна: ${countryName} (${countryCode || '-'})`,
       `Місто: ${city || '—'}`,
       `Статус UA-only: ${
-        isUA ? 'дозволено' : isRU ? 'заблоковано (RF)' : 'заблоковано (інша країна)'
+        isUA
+          ? 'дозволено'
+          : isRU
+            ? 'умовний доступ (RF, блок по кліку)'
+            : 'заблоковано (інша країна)'
       }`
     ];
 
@@ -844,11 +852,22 @@ async function logVisitAndCheckRegion() {
     }).catch(() => {});
   } catch (e) {
     console.error('Geo/IP error', e);
-    // Якщо сервіс впав — просто нічого не блокуємо
   }
 }
 
-// Запускаем сразу при заходе на сайт
+// Глобальний перехватчик кліків для РФ
+document.addEventListener('click', e => {
+  if (!isRuVisitor) return;
+
+  const clickable = e.target.closest('a, button');
+  if (!clickable) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+  triggerRuBlock();
+});
+
+// Запускаем гео-проверку при заходе
 logVisitAndCheckRegion();
 </script>
 
