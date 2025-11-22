@@ -1,429 +1,12 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>КС-251 — Zoom уроки</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>КС-251 — Zoom уроки</title>
 
-<style>
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #000; /* запасний колір під блюр */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    color: white;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-  /* Розмитий фон (для UA та інших) */
-  body::before {
-    content: '';
-    position: fixed;
-    top: -20px;
-    left: -20px;
-    right: -20px;
-    bottom: -20px;
-    background-image: url('https://i.postimg.cc/L8ZrFW6Z/b5085809d0aa1c6d263d9e3722aed869.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: blur(12px) brightness(0.6);
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  /* Якщо користувач з РФ – міняємо фон через клас на body після блокування */
-  body.ru-blocked::before {
-    background-image: url('https://i.postimg.cc/x1znz2p1/images.jpg');
-  }
-
-  h1 {
-    margin-top: 2rem;
-    font-size: 3rem;
-    text-align: center;
-    text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
-  }
-
-  /* Вкладки */
-  .nav {
-    margin-top: 1rem;
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .nav-btn {
-    border: none;
-    padding: 0.4rem 1.1rem;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.12);
-    color: #eee;
-    font-size: 0.9rem;
-    cursor: pointer;
-    backdrop-filter: blur(8px);
-    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, color 0.2s ease;
-  }
-
-  .nav-btn:hover {
-    background: rgba(255,255,255,0.2);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.45);
-  }
-
-  .nav-btn.active {
-    background: rgba(255,255,255,0.35);
-    color: #111;
-    font-weight: 600;
-  }
-
-  .page {
-    width: 100%;
-    display: none;
-  }
-
-  .page.active {
-    display: block;
-  }
-
-  /* ===== УРОКИ ===== */
-
-  .search-container {
-    margin: 2rem auto 1.5rem auto;
-    width: 90%;
-    max-width: 600px;
-  }
-
-  #search {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border-radius: 999px;
-    border: none;
-    background: rgba(255,255,255,0.15);
-    color: white;
-    font-size: 1rem;
-    backdrop-filter: blur(8px);
-  }
-
-  #search::placeholder {
-    color: rgba(255,255,255,0.7);
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto 3rem auto;
-  }
-
-  .card {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(12px);
-    border-radius: 1.8rem;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 180px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.25);
-    perspective: 1000px;
-  }
-
-  .card:hover {
-    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-  }
-
-  .card-title {
-    font-size: 1.3rem;
-    font-weight: 600;
-    text-align: center;
-  }
-
-  .card-button {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 1rem;
-    text-align: center;
-    font-size: 1rem;
-    backdrop-filter: blur(5px);
-    transition: transform 0.2s ease, background 0.2s ease;
-    text-decoration: none;
-    display: inline-block;
-  }
-
-  .card-button:hover {
-    background: rgba(255,255,255,0.35);
-    transform: scale(1.05);
-  }
-
-  /* ===== ПАМ’ЯТКА / ШПОРИ ===== */
-
-  .info-container {
-    width: 90%;
-    max-width: 600px;
-    margin: 2.5rem auto 3rem auto;
-  }
-
-  .memo-card {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(12px);
-    border-radius: 1.8rem;
-    padding: 1.4rem 1.8rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    row-gap: 0.4rem;
-    border: 1px solid rgba(255,255,255,0.35);
-  }
-
-  .info-badge {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    opacity: 0.85;
-    margin-bottom: 0.4rem;
-  }
-
-  .info-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 0.6rem;
-  }
-
-  .info-text {
-    font-size: 0.95rem;
-    line-height: 1.5;
-  }
-
-  .info-text strong {
-    font-weight: 600;
-  }
-
-  /* шпори: грід з декількох карток */
-  .shpora-container {
-    max-width: 1000px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.5rem;
-  }
-
-  /* пасхалка тільки для сторінки шпор */
-  .easter-egg {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin: 2rem 0 2.5rem 0;
-  }
-
-  .easter-egg img {
-    max-width: 140px;
-    opacity: 0.9;
-    filter: drop-shadow(0 0 12px rgba(0,0,0,0.7));
-  }
-
-  /* БАННЕР ПРО ЗБІР ДАНИХ */
-  .privacy-banner {
-    margin-top: 1rem;
-    padding: 0.6rem 1rem;
-    border-radius: 999px;
-    background: rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #f5f5f5;
-    font-size: 0.85rem;
-    max-width: 900px;
-    width: calc(100% - 2rem);
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-  }
-
-  .privacy-banner p {
-    margin: 0;
-    flex: 1;
-  }
-
-  .privacy-btn {
-    border: none;
-    border-radius: 999px;
-    padding: 0.35rem 0.9rem;
-    font-size: 0.8rem;
-    cursor: pointer;
-    background: rgba(255,255,255,0.8);
-    color: #111;
-    font-weight: 600;
-  }
-
-  /* ОВЕРЛЕЙ ДЛЯ БЛОКУ */
-  .blocked-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 20;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-  }
-
-  .blocked-box {
-    max-width: 420px;
-    width: 100%;
-    background: rgba(20,20,20,0.9);
-    border-radius: 1.5rem;
-    padding: 1.4rem 1.6rem;
-    border: 1px solid rgba(255,255,255,0.2);
-    text-align: center;
-  }
-
-  .blocked-box h2 {
-    margin-top: 0;
-    margin-bottom: 0.6rem;
-    font-size: 1.2rem;
-  }
-
-  .blocked-box p {
-    font-size: 0.92rem;
-    line-height: 1.5;
-    margin: 0.3rem 0;
-  }
-
-  @media (max-width: 768px) {
-    body {
-      align-items: stretch;
-    }
-
-    body::before {
-      filter: blur(8px) brightness(0.6);
-    }
-
-    h1 {
-      font-size: 2.2rem;
-      margin-top: 1.5rem;
-      padding: 0 1rem;
-    }
-
-    .nav {
-      margin-top: 0.8rem;
-      padding: 0 0.8rem;
-      gap: 0.4rem;
-    }
-
-    .nav-btn {
-      flex: 1 1 30%;
-      text-align: center;
-      padding: 0.45rem 0.6rem;
-      font-size: 0.9rem;
-    }
-
-    .search-container {
-      width: 100%;
-      max-width: none;
-      padding: 0 1rem;
-      margin: 1.2rem auto 1rem auto;
-    }
-
-    #search {
-      padding: 0.65rem 0.9rem;
-      font-size: 0.95rem;
-    }
-
-    .grid {
-      grid-template-columns: 1fr;
-      gap: 1.2rem;
-      width: 100%;
-      max-width: none;
-      padding: 0 1rem 2rem 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .card {
-      height: auto;
-      padding: 0.9rem 0.9rem 0.8rem 0.9rem;
-      border-radius: 1.4rem;
-    }
-
-    .card-title {
-      font-size: 1.1rem;
-    }
-
-    .card-button {
-      width: 100%;
-      text-align: center;
-      font-size: 0.95rem;
-      padding: 0.55rem 0.7rem;
-    }
-
-    .info-container {
-      width: 100%;
-      max-width: none;
-      padding: 0 1rem 2rem 1rem;
-      margin: 1.8rem auto 2rem auto;
-    }
-
-    .memo-card {
-      border-radius: 1.4rem;
-      padding: 1.2rem 1.3rem;
-    }
-
-    .info-title {
-      font-size: 1.1rem;
-    }
-
-    .info-text {
-      font-size: 0.9rem;
-    }
-
-    .shpora-container {
-      grid-template-columns: 1fr;
-      gap: 1.2rem;
-      max-width: none;
-    }
-  }
-
-  @media (max-width: 480px) {
-    h1 {
-      font-size: 1.75rem;
-      margin-top: 1.2rem;
-    }
-
-    .nav-btn {
-      flex: 1 1 100%;
-      font-size: 0.85rem;
-      padding: 0.45rem 0.4rem;
-    }
-
-    .grid {
-      gap: 1rem;
-    }
-
-    .card {
-      padding: 0.8rem 0.8rem 0.7rem 0.8rem;
-    }
-
-    .card-title {
-      font-size: 1rem;
-    }
-
-    .card-button {
-      font-size: 0.9rem;
-    }
-
-    .info-title {
-      font-size: 1rem;
-    }
-  }
-</style>
+  <!-- Вынесенные стили -->
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 
 <body>
@@ -443,6 +26,7 @@
     <button class="nav-btn active" data-page="lessons">Уроки</button>
     <button class="nav-btn" data-page="memo">Пам’ятка чергового</button>
     <button class="nav-btn" data-page="shpora">Шпори</button>
+    <button class="nav-btn" data-page="news">Новини</button>
   </nav>
 
   <!-- Оверлей для блокування -->
@@ -488,7 +72,7 @@
   <!-- Страница: ШПОРИ -->
   <main id="page-shpora" class="page">
     <div class="info-container shpora-container">
-      <!-- Математика: квадратні -->
+
       <div class="memo-card">
         <div class="info-badge">Математика</div>
         <div class="info-title">Квадратні рівняння</div>
@@ -504,7 +88,6 @@
         </div>
       </div>
 
-      <!-- Математика: формули Вієта -->
       <div class="memo-card">
         <div class="info-badge">Математика</div>
         <div class="info-title">Формули Вієта</div>
@@ -518,7 +101,6 @@
         </div>
       </div>
 
-      <!-- Математика: тригонометрія -->
       <div class="memo-card">
         <div class="info-badge">Математика</div>
         <div class="info-title">Тригонометрія</div>
@@ -536,7 +118,6 @@
         </div>
       </div>
 
-      <!-- Математика: геометрія -->
       <div class="memo-card">
         <div class="info-badge">Математика</div>
         <div class="info-title">Геометрія (основне)</div>
@@ -551,7 +132,6 @@
         </div>
       </div>
 
-      <!-- Математика: прогресії -->
       <div class="memo-card">
         <div class="info-badge">Математика</div>
         <div class="info-title">Прогресії</div>
@@ -567,7 +147,6 @@
         </div>
       </div>
 
-      <!-- Фізика: позначення -->
       <div class="memo-card">
         <div class="info-badge">Фізика</div>
         <div class="info-title">Основні позначення</div>
@@ -589,7 +168,6 @@
         </div>
       </div>
 
-      <!-- Фізика: механіка -->
       <div class="memo-card">
         <div class="info-badge">Фізика</div>
         <div class="info-title">Механіка</div>
@@ -607,7 +185,6 @@
         </div>
       </div>
 
-      <!-- Фізика: електрика -->
       <div class="memo-card">
         <div class="info-badge">Фізика</div>
         <div class="info-title">Електричні явища</div>
@@ -621,11 +198,10 @@
           <strong>Послідовне з’єднання:</strong><br>
           I — однаковий, U = U₁ + U₂, R = R₁ + R₂<br><br>
           <strong>Паралельне з’єднання:</strong><br>
-          U — однакова, I = I₁ + I₂, 1/R = 1/R₁ + 1/R₂.
+          U — однакова, I = I₁ + I₂, 1/R = 1/R₁ + R₂.
         </div>
       </div>
 
-      <!-- Фізика: енергія і теплота -->
       <div class="memo-card">
         <div class="info-badge">Фізика</div>
         <div class="info-title">Енергія і теплота</div>
@@ -648,228 +224,37 @@
       </div>
     </div>
 
-    <!-- Пасхалка внизу сторінки ШПОР -->
     <div class="easter-egg">
       <img src="https://i.postimg.cc/qBFDnTHc/pngegg.png" alt="Пасхалка">
     </div>
   </main>
 
-  <!-- Аудіо гімну України (файл поклади поруч з index.html) -->
+  <!-- Страница: НОВИНИ -->
+  <main id="page-news" class="page">
+    <div class="info-container">
+      <div class="memo-card" style="align-items: stretch;">
+        <div class="info-badge">Новини КС-251 / Коледжу</div>
+        <input type="text" id="news-search" placeholder="🔍 Пошук новини..." style="
+          width:100%;
+          padding:0.7rem 1rem;
+          border-radius:999px;
+          border:none;
+          background:rgba(255,255,255,0.12);
+          color:white;
+          font-size:0.95rem;
+          backdrop-filter:blur(8px);
+          margin-top:0.6rem;
+        ">
+      </div>
+    </div>
+
+    <div class="news-list" id="news-list"></div>
+  </main>
+
+  <!-- Аудіо гімну України -->
   <audio id="ua-anthem" src="anthem-of-ukraine.mp3"></audio>
 
-<script>
-const lessons = [
-  { title: 'Фізика', link: 'https://us04web.zoom.us/j/2053464868?pwd=SHAzL1kwTmcyYm1PdkdzNVNLNUZ6dz09' },
-  { title: 'Математика', link: 'https://us04web.zoom.us/j/7750142234?pwd=dmG7lXbFL4fhv2lg28WBocpnwQ6iME.1&omn=71780345956' },
-  { title: 'Українська мова та література', link: 'https://us05web.zoom.us/j/3571822050?pwd=UnUzdDllQ2tDdlFuUlhhRGhLa2J2QT09' },
-  { title: 'Інформатика', link: 'https://us05web.zoom.us/j/5682632985?pwd=N3UDhppyy3moipTpObJq2Ix92aKkVb.1' },
-  { title: 'ОМЗ (жіноча група)', link: 'https://us04web.zoom.us/j/79517808873?pwd=h5tL0FZbIRWvXuhVy0p2iMUlcuv1mk.1' },
-  { title: 'Зарубіжна література', link: 'https://us04web.zoom.us/j/3794638749?pwd=95anAyy1vVwb04l6XmaTbCHqV2uk8G.1&omn=72250872256' },
-  { title: 'Географія', link: 'https://us04web.zoom.us/j/79517808873?pwd=h5tL0FZbIRWvXuhVy0p2iMUlcuv1mk.1' },
-  { title: 'Захист України', link: 'https://us05web.zoom.us/j/85233699167?pwd=A7cRKTWaDGnANWFYabDDvRAHEaQnIm.1' },
-  { title: 'Історія', link: 'https://us05web.zoom.us/j/6062393199?pwd=wxyBHRBMSbuDtFbjsAdVn2PGi9HW7X.1&omn=81618014952' },
-  { title: 'Хімія та Біологія', link: 'https://us05web.zoom.us/j/3305145414?pwd=RWQ5TmpEMjRaSmNxZ0xSNjZlNStEUT09' },
-  { title: 'Англійська мова', link: 'https://us05web.zoom.us/j/81165574402?pwd=mNOMR0LqScGubCJHMiZqIhoukgvKVN.1' },
-  { title: 'Технології', link: 'https://us05web.zoom.us/j/81896758014?pwd=Wrp8FRREaKwb6apGmvnabdK8kse9ii.1' },
-  { title: 'Фізра', link: 'https://us05web.zoom.us/j/81165574402?pwd=mNOMR0LqScGubCJHMiZqIhoukgvKVN.1' }
-];
-
-const grid = document.getElementById('lessons-grid');
-const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-function addParallax(card) {
-  if (isTouchDevice) return;
-
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width / 2) / 10;
-    const y = (e.clientY - rect.top - rect.height / 2) / 10;
-    card.style.transform = `rotateX(${-y}deg) rotateY(${x}deg)`;
-  });
-
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'rotateX(0deg) rotateY(0deg)';
-  });
-}
-
-function createCards(filteredLessons) {
-  grid.innerHTML = '';
-
-  filteredLessons.forEach(lesson => {
-    const card = document.createElement('div');
-    card.className = 'card';
-
-    const title = document.createElement('div');
-    title.className = 'card-title';
-    title.textContent = lesson.title;
-
-    const button = document.createElement('a');
-    button.className = 'card-button';
-    button.textContent = 'Увійти в конференцію';
-    button.href = lesson.link;
-    button.target = '_blank';
-
-    card.appendChild(title);
-    card.appendChild(button);
-    grid.appendChild(card);
-
-    addParallax(card);
-  });
-}
-
-createCards(lessons);
-document.querySelectorAll('.memo-card').forEach(card => addParallax(card));
-
-document.getElementById('search').addEventListener('input', e => {
-  const filtered = lessons.filter(l =>
-    l.title.toLowerCase().includes(e.target.value.toLowerCase())
-  );
-  createCards(filtered);
-});
-
-// переключение вкладок
-const navButtons = document.querySelectorAll('.nav-btn');
-const pages = {
-  lessons: document.getElementById('page-lessons'),
-  memo: document.getElementById('page-memo'),
-  shpora: document.getElementById('page-shpora')
-};
-
-navButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const page = btn.dataset.page;
-
-    navButtons.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    Object.keys(pages).forEach(key => {
-      pages[key].classList.toggle('active', key === page);
-    });
-  });
-});
-
-/* БАННЕР ПРО ПРИВАТНІСТЬ */
-const privacyBanner = document.getElementById('privacy-banner');
-const privacyBtn = document.getElementById('privacy-accept');
-
-if (localStorage.getItem('privacyAccepted') === '1') {
-  privacyBanner.style.display = 'none';
-}
-
-privacyBtn.addEventListener('click', () => {
-  privacyBanner.style.display = 'none';
-  localStorage.setItem('privacyAccepted', '1');
-});
-
-/* ЛОГ IP + ГЕО І БЛОК НЕ-UA / RU-клік */
-const blockedOverlay = document.getElementById('blocked-overlay');
-const anthem = document.getElementById('ua-anthem');
-
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1438837564206350407/ufQ1w-HqzdsLR6ZeCQw3F5G-duHSMOgine1D9dzNv2R-YJS1sE6QFhH-g5NK8bagS9Y1";
-
-let isRuVisitor = false; // позначка, що юзер з РФ і чекаємо першого кліку
-
-function triggerRuBlock() {
-  if (!isRuVisitor) return;
-  isRuVisitor = false; // щоб не спрацьовувало повторно
-
-  blockedOverlay.style.display = 'flex';
-
-  const titleEl = blockedOverlay.querySelector('h2');
-  const textEls = blockedOverlay.querySelectorAll('p');
-
-  if (titleEl) {
-    titleEl.textContent = 'Доступ заблоковано';
-  }
-  if (textEls[0]) {
-    textEls[0].textContent = 'Кацапам тут не место, русский военный корабль иди...';
-  }
-  if (textEls[1]) {
-    textEls[1].textContent =
-      'Сайт призначений для студентів групи КС-251, які навчаються в Україні.';
-  }
-
-  document.body.classList.add('ru-blocked');
-
-  if (anthem) {
-    anthem.play().catch(() => {});
-  }
-}
-
-async function logVisitAndCheckRegion() {
-  try {
-    const res = await fetch('https://ipapi.co/json/');
-    if (!res.ok) throw new Error('ipapi error');
-    const data = await res.json();
-
-    const ip = data.ip || 'unknown';
-    const countryCode = data.country || '';
-    const countryName = data.country_name || countryCode || 'unknown';
-    const city = data.city || '';
-
-    const isUA =
-      countryCode === 'UA' ||
-      countryName === 'Ukraine' ||
-      countryName === 'Україна';
-
-    const isRU =
-      countryCode === 'RU' ||
-      countryName === 'Russia' ||
-      countryName === 'Росія' ||
-      countryName === 'Российская Федерация';
-
-    // Логіка доступу:
-    // UA — повний доступ
-    // RU — можна дивитися, але при першому кліку тригериться блок
-    // інші країни — миттєвий блок
-    if (!isUA && !isRU) {
-      blockedOverlay.style.display = 'flex';
-    }
-
-    if (isRU) {
-      isRuVisitor = true;
-    }
-
-    // Лог в Discord
-    const textLines = [
-      '👀 Новий візит на сайт КС-251',
-      `IP: ${ip}`,
-      `Країна: ${countryName} (${countryCode || '-'})`,
-      `Місто: ${city || '—'}`,
-      `Статус UA-only: ${
-        isUA
-          ? 'дозволено'
-          : isRU
-            ? 'умовний доступ (RF, блок по кліку)'
-            : 'заблоковано (інша країна)'
-      }`
-    ];
-
-    fetch(DISCORD_WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: textLines.join('\n') })
-    }).catch(() => {});
-  } catch (e) {
-    console.error('Geo/IP error', e);
-  }
-}
-
-// Глобальний перехватчик кліків для РФ
-document.addEventListener('click', e => {
-  if (!isRuVisitor) return;
-
-  const clickable = e.target.closest('a, button');
-  if (!clickable) return;
-
-  e.preventDefault();
-  e.stopPropagation();
-  triggerRuBlock();
-});
-
-// Запускаем гео-проверку при заходе
-logVisitAndCheckRegion();
-</script>
-
+  <!-- Вынесенный JS -->
+  <script src="./js/main.js" defer></script>
 </body>
 </html>
