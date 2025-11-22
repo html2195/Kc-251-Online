@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>КС-251 — Zoom уроки</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КС-251 — Zoom уроки</title>
 
-  <!-- Стили лежат в корне репы -->
-  <link rel="stylesheet" href="./style.css">
+<!-- Стили лежат в корне -->
+<link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
@@ -72,10 +72,169 @@
   <!-- Страница: ШПОРИ -->
   <main id="page-shpora" class="page">
     <div class="info-container shpora-container">
-      <!-- (шпоры оставил как были) -->
-      ...твой контент шпор без изменений...
+
+      <!-- Математика: квадратні -->
+      <div class="memo-card">
+        <div class="info-badge">Математика</div>
+        <div class="info-title">Квадратні рівняння</div>
+        <div class="info-text">
+          <strong>Загальний вигляд:</strong> ax² + bx + c = 0, a ≠ 0<br><br>
+          <strong>Дискримінант:</strong> D = b² − 4ac<br>
+          <strong>Корені:</strong><br>
+          x₁ = (−b + √D) / 2a<br>
+          x₂ = (−b − √D) / 2a<br><br>
+          Якщо D &gt; 0 — 2 корені,<br>
+          D = 0 — 1 корінь,<br>
+          D &lt; 0 — дійсних коренів немає.
+        </div>
+      </div>
+
+      <!-- Математика: формули Вієта -->
+      <div class="memo-card">
+        <div class="info-badge">Математика</div>
+        <div class="info-title">Формули Вієта</div>
+        <div class="info-text">
+          Для рівняння ax² + bx + c = 0 (a ≠ 0), корені x₁, x₂:<br><br>
+          <strong>Сума коренів:</strong> x₁ + x₂ = −b / a<br>
+          <strong>Добуток коренів:</strong> x₁ · x₂ = c / a<br><br>
+          Якщо a = 1 (x² + px + q = 0):<br>
+          x₁ + x₂ = −p,<br>
+          x₁ · x₂ = q.
+        </div>
+      </div>
+
+      <!-- Математика: тригонометрія -->
+      <div class="memo-card">
+        <div class="info-badge">Математика</div>
+        <div class="info-title">Тригонометрія</div>
+        <div class="info-text">
+          <strong>Основні означення (прямокутний трикутник):</strong><br>
+          sin α = протилежний катет / гіпотенуза<br>
+          cos α = прилеглий катет / гіпотенуза<br>
+          tg α = протилежний катет / прилеглий катет<br>
+          ctg α = прилеглий / протилежний<br><br>
+          <strong>Основні тотожності:</strong><br>
+          sin²α + cos²α = 1<br>
+          1 + tg²α = 1 / cos²α<br>
+          1 + ctg²α = 1 / sin²α<br><br>
+          <strong>Значення:</strong> sin 0° = 0, sin 30° = 1/2, sin 45° = √2/2, sin 60° = √3/2.
+        </div>
+      </div>
+
+      <!-- Математика: геометрія -->
+      <div class="memo-card">
+        <div class="info-badge">Математика</div>
+        <div class="info-title">Геометрія (основне)</div>
+        <div class="info-text">
+          <strong>Теорема Піфагора:</strong> a² + b² = c² (c — гіпотенуза)<br><br>
+          <strong>Площа прямокутника:</strong> S = a · b<br>
+          <strong>Площа трикутника:</strong> S = (a · h) / 2<br>
+          <strong>Площа круга:</strong> S = πr²<br>
+          <strong>Довжина кола:</strong> L = 2πr<br><br>
+          <strong>Пряма пропорційність:</strong> y = kx<br>
+          <strong>Обернена пропорційність:</strong> y = k / x
+        </div>
+      </div>
+
+      <!-- Математика: прогресії -->
+      <div class="memo-card">
+        <div class="info-badge">Математика</div>
+        <div class="info-title">Прогресії</div>
+        <div class="info-text">
+          <strong>Арифметична прогресія:</strong><br>
+          aₙ = a₁ + (n − 1)d<br>
+          Sₙ = (a₁ + aₙ) · n / 2<br>
+          де d — різниця прогресії.<br><br>
+          <strong>Геометрична прогресія:</strong><br>
+          bₙ = b₁ · qⁿ⁻¹<br>
+          Sₙ = b₁ · (qⁿ − 1) / (q − 1), q ≠ 1<br>
+          де q — знаменник прогресії.
+        </div>
+      </div>
+
+      <!-- Фізика: позначення -->
+      <div class="memo-card">
+        <div class="info-badge">Фізика</div>
+        <div class="info-title">Основні позначення</div>
+        <div class="info-text">
+          <strong>t</strong> — час (с)<br>
+          <strong>s</strong> — шлях / відстань (м)<br>
+          <strong>v</strong> — швидкість (м/с)<br>
+          <strong>a</strong> — прискорення (м/с²)<br>
+          <strong>F</strong> — сила (Н)<br>
+          <strong>m</strong> — маса (кг)<br>
+          <strong>g</strong> — прискорення вільного падіння (≈9,8 м/с²)<br>
+          <strong>W</strong> — робота (Дж)<br>
+          <strong>P</strong> — потужність (Вт)<br>
+          <strong>p</strong> — тиск (Па)<br>
+          <strong>ρ</strong> — густина (кг/м³)<br>
+          <strong>U</strong> — напруга (В)<br>
+          <strong>I</strong> — сила струму (А)<br>
+          <strong>R</strong> — опір (Ом)
+        </div>
+      </div>
+
+      <!-- Фізика: механіка -->
+      <div class="memo-card">
+        <div class="info-badge">Фізика</div>
+        <div class="info-title">Механіка</div>
+        <div class="info-text">
+          <strong>Рівномірний рух:</strong><br>
+          v = s / t &nbsp;→&nbsp; s = v · t<br><br>
+          <strong>Рівноприскорений рух:</strong><br>
+          a = (v₂ − v₁) / t<br>
+          s = v₀t + (a t²) / 2<br><br>
+          <strong>Другий закон Ньютона:</strong> F = m · a<br>
+          <strong>Вага тіла:</strong> P = m · g<br><br>
+          <strong>Імпульс:</strong> p = m · v<br>
+          <strong>Закон збереження імпульсу:</strong><br>
+          p₁ + p₂ = const (у замкнутій системі).
+        </div>
+      </div>
+
+      <!-- Фізика: електрика -->
+      <div class="memo-card">
+        <div class="info-badge">Фізика</div>
+        <div class="info-title">Електричні явища</div>
+        <div class="info-text">
+          <strong>Закон Ома (для ділянки кола):</strong><br>
+          I = U / R<br><br>
+          <strong>Електрична потужність:</strong><br>
+          P = U · I = I²R = U² / R<br><br>
+          <strong>Робота струму:</strong><br>
+          A = U · I · t = P · t<br><br>
+          <strong>Послідовне з’єднання:</strong><br>
+          I — однаковий, U = U₁ + U₂, R = R₁ + R₂<br><br>
+          <strong>Паралельне з’єднання:</strong><br>
+          U — однакова, I = I₁ + I₂, 1/R = 1/R₁ + 1/R₂.
+        </div>
+      </div>
+
+      <!-- Фізика: енергія і теплота -->
+      <div class="memo-card">
+        <div class="info-badge">Фізика</div>
+        <div class="info-title">Енергія і теплота</div>
+        <div class="info-text">
+          <strong>Кінетична енергія:</strong><br>
+          Eₖ = m v² / 2<br><br>
+          <strong>Потенціальна енергія (у полі g):</strong><br>
+          Eₚ = m g h<br><br>
+          <strong>Повна механічна енергія:</strong><br>
+          E = Eₖ + Eₚ<br>
+          (у відсутності втрат — зберігається)<br><br>
+          <strong>Кількість теплоти (нагрівання):</strong><br>
+          Q = c m Δt<br>
+          де c — питома теплоємність,<br>
+          Δt = t₂ − t₁<br><br>
+          <strong>Питома теплота плавлення / пароутворення:</strong><br>
+          Q = λ m (плавлення)<br>
+          Q = r m (пароутворення).
+        </div>
+      </div>
+
     </div>
 
+    <!-- Пасхалка внизу -->
     <div class="easter-egg">
       <img src="https://i.postimg.cc/qBFDnTHc/pngegg.png" alt="Пасхалка">
     </div>
@@ -99,14 +258,13 @@
         ">
       </div>
     </div>
-
     <div class="news-list" id="news-list"></div>
   </main>
 
   <!-- Аудіо гімну України -->
   <audio id="ua-anthem" src="anthem-of-ukraine.mp3"></audio>
 
-  <!-- Скрипт лежит в корне репы -->
+  <!-- Скрипт лежит в корне -->
   <script src="./main.js" defer></script>
 </body>
 </html>
