@@ -1,4 +1,4 @@
-/* ВАЖНО: нормальный бокс-моделинг */
+/* нормальный бокс-моделинг */
 *,
 *::before,
 *::after {
@@ -8,7 +8,7 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #000; /* запасний колір під блюр */
+  background-color: #000;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,7 +18,7 @@ body {
   position: relative;
 }
 
-/* Розмитий фон (для UA та інших) */
+/* Розмитий фон */
 body::before {
   content: '';
   position: fixed;
@@ -35,7 +35,7 @@ body::before {
   pointer-events: none;
 }
 
-/* Якщо користувач з РФ – міняємо фон через клас на body після блокування */
+/* якщо юзер з РФ — інший фон */
 body.ru-blocked::before {
   background-image: url('https://i.postimg.cc/x1znz2p1/images.jpg');
 }
@@ -85,19 +85,17 @@ h1 {
   width: 100%;
   display: none;
 }
-.page.active {
-  display: block;
-}
+.page.active { display: block; }
 
 /* ===== УРОКИ ===== */
-
 .search-container {
   margin: 2rem auto 1.5rem auto;
   width: 90%;
   max-width: 600px;
 }
 
-#search {
+#search,
+.search-input {
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 999px;
@@ -108,7 +106,8 @@ h1 {
   backdrop-filter: blur(8px);
 }
 
-#search::placeholder {
+#search::placeholder,
+.search-input::placeholder {
   color: rgba(255,255,255,0.7);
 }
 
@@ -136,17 +135,14 @@ h1 {
   border: 1px solid rgba(255,255,255,0.25);
   perspective: 1000px;
 }
-
 .card:hover {
   box-shadow: 0 15px 30px rgba(0,0,0,0.5);
 }
-
 .card-title {
   font-size: 1.3rem;
   font-weight: 600;
   text-align: center;
 }
-
 .card-button {
   background: rgba(255, 255, 255, 0.2);
   border: none;
@@ -160,17 +156,15 @@ h1 {
   text-decoration: none;
   display: inline-block;
 }
-
 .card-button:hover {
   background: rgba(255,255,255,0.35);
   transform: scale(1.05);
 }
 
-/* ===== ПАМ’ЯТКА / ШПОРИ ===== */
-
+/* ===== ПАМ’ЯТКА / ШПОРИ / НОВИНИ ===== */
 .info-container {
   width: 90%;
-  max-width: 600px;
+  max-width: 900px;
   margin: 2.5rem auto 3rem auto;
 }
 
@@ -204,9 +198,10 @@ h1 {
   font-size: 0.95rem;
   line-height: 1.5;
 }
+
 .info-text strong { font-weight: 600; }
 
-/* шпори: грід з декількох карток */
+/* шпори */
 .shpora-container {
   max-width: 1000px;
   display: grid;
@@ -214,21 +209,20 @@ h1 {
   gap: 1.5rem;
 }
 
-/* пасхалка тільки для сторінки шпор */
+/* пасхалка */
 .easter-egg {
   width: 100%;
   display: flex;
   justify-content: center;
   margin: 2rem 0 2.5rem 0;
 }
-
 .easter-egg img {
   max-width: 140px;
   opacity: 0.9;
   filter: drop-shadow(0 0 12px rgba(0,0,0,0.7));
 }
 
-/* БАННЕР ПРО ЗБІР ДАНИХ */
+/* Баннер приватности */
 .privacy-banner {
   margin-top: 1rem;
   padding: 0.6rem 1rem;
@@ -243,12 +237,7 @@ h1 {
   align-items: center;
   gap: 0.8rem;
 }
-
-.privacy-banner p {
-  margin: 0;
-  flex: 1;
-}
-
+.privacy-banner p { margin: 0; flex: 1; }
 .privacy-btn {
   border: none;
   border-radius: 999px;
@@ -260,7 +249,7 @@ h1 {
   font-weight: 600;
 }
 
-/* ОВЕРЛЕЙ ДЛЯ БЛОКУ */
+/* Overlay block */
 .blocked-overlay {
   position: fixed;
   inset: 0;
@@ -271,7 +260,6 @@ h1 {
   justify-content: center;
   padding: 1.5rem;
 }
-
 .blocked-box {
   max-width: 420px;
   width: 100%;
@@ -281,85 +269,18 @@ h1 {
   border: 1px solid rgba(255,255,255,0.2);
   text-align: center;
 }
-
 .blocked-box h2 {
   margin-top: 0;
   margin-bottom: 0.6rem;
   font-size: 1.2rem;
 }
-
 .blocked-box p {
   font-size: 0.92rem;
   line-height: 1.5;
   margin: 0.3rem 0;
 }
 
-/* ===== НОВИНИ ===== */
-
-.news-list{
-  width: 90%;
-  max-width: 1000px;
-  margin: 0 auto 3rem auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.news-card{
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(12px);
-  border-radius: 1.6rem;
-  padding: 1.2rem 1.4rem;
-  border: 1px solid rgba(255,255,255,0.3);
-  display:flex;
-  flex-direction:column;
-  gap:0.6rem;
-  transition: transform .25s ease, box-shadow .25s ease;
-}
-
-.news-card:hover{
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(0,0,0,0.5);
-}
-
-.news-title{
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-.news-date{
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-
-.news-text{
-  font-size: 0.95rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-}
-
-.news-link{
-  align-self:flex-start;
-  margin-top:0.2rem;
-  text-decoration:none;
-  background: rgba(255,255,255,0.2);
-  padding:0.45rem 0.9rem;
-  border-radius:999px;
-  color:white;
-  font-size:0.9rem;
-  transition: background .2s ease, transform .2s ease;
-}
-.news-link:hover{
-  background: rgba(255,255,255,0.35);
-  transform: scale(1.03);
-}
-
-.news-important{
-  border-color: rgba(255, 120, 120, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(255,120,120,0.6);
-}
-
-/* ========== МОБИЛЬНАЯ АДАПТАЦИЯ ========== */
+/* ===== МОБИЛКА ===== */
 @media (max-width: 768px) {
   body { align-items: stretch; }
   body::before { filter: blur(8px) brightness(0.6); }
@@ -382,7 +303,8 @@ h1 {
     padding: 0 1rem;
     margin: 1rem auto 0.8rem auto;
   }
-  #search {
+
+  #search, .search-input {
     padding: 0.6rem 0.9rem;
     font-size: 0.95rem;
   }
@@ -413,8 +335,6 @@ h1 {
   }
 
   .card-button {
-    width: auto;
-    text-align: center;
     font-size: 0.92rem;
     padding: 0.5rem 0.9rem;
     border-radius: 999px;
@@ -427,12 +347,10 @@ h1 {
     padding: 0 1rem 2rem 1rem;
     margin: 1.8rem auto 2rem auto;
   }
-
   .memo-card {
     border-radius: 1.4rem;
     padding: 1.2rem 1.3rem;
   }
-
   .info-title { font-size: 1.1rem; }
   .info-text { font-size: 0.9rem; }
 
@@ -440,12 +358,6 @@ h1 {
     grid-template-columns: 1fr;
     gap: 1.2rem;
     max-width: none;
-  }
-
-  .news-list{
-    grid-template-columns: 1fr;
-    width:100%;
-    padding:0 1rem 2rem 1rem;
   }
 }
 
@@ -457,7 +369,7 @@ h1 {
     padding: 0 0.8rem;
     scrollbar-width: none;
   }
-  .nav::-webkit-scrollbar { display: none; }
+  .nav::-webkit-scrollbar { display:none; }
 
   .nav-btn {
     flex: 0 0 auto;
