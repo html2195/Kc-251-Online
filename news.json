@@ -4,6 +4,10 @@
     "title": "Update 1.1",
     "date": "2025-11-22",
     "text": "На сайт додана можливість завантажувати новини адміністрацією",
-    "important": true
+    "important": true,
+    "status": "published",
+    "pinned": false,
+    "author": "unknown",
+    "author_ds": "unknown"
   }
 ]
