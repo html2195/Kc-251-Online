@@ -6,7 +6,7 @@
     "text": "На сайт додана можливість завантажувати новини адміністрацією",
     "important": true,
     "status": "published",
-    "pinned": false,
+    "pinned": true,
     "author": "unknown",
     "author_ds": "unknown"
   }
