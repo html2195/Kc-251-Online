@@ -9,5 +9,16 @@
     "status": "published",
     "author": "Найт Мегатрон",
     "author_ds": "night_megatron"
+  },
+  {
+    "id": 1764019569,
+    "title": "Update 1.2",
+    "text": "Додано більше шпор, зроблена заготовка під коментарі",
+    "important": true,
+    "pinned": false,
+    "status": "published",
+    "date": "2025-11-24",
+    "author_profile": "Найт Мегатрон",
+    "author_ds": "night_megatron"
   }
 ]
