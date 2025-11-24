@@ -21,14 +21,26 @@ const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 function addParallax(card) {
   if (isTouchDevice) return;
 
-  card.addEventListener('mousemove', e => {
+  let rafId = 0;
+  let lastX = 0;
+  let lastY = 0;
+
+  card.addEventListener('mousemove', (e) => {
     const rect = card.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width / 2) / 10;
-    const y = (e.clientY - rect.top - rect.height / 2) / 10;
-    card.style.transform = `rotateX(${-y}deg) rotateY(${x}deg)`;
-  });
+    lastX = (e.clientX - rect.left - rect.width / 2) / 10;
+    lastY = (e.clientY - rect.top - rect.height / 2) / 10;
+
+    if (!rafId) {
+      rafId = requestAnimationFrame(() => {
+        card.style.transform = `rotateX(${-lastY}deg) rotateY(${lastX}deg)`;
+        rafId = 0;
+      });
+    }
+  }, { passive: true });
 
   card.addEventListener('mouseleave', () => {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
     card.style.transform = 'rotateX(0deg) rotateY(0deg)';
   });
 }
@@ -73,6 +85,7 @@ const pages = {
   lessons: document.getElementById('page-lessons'),
   memo: document.getElementById('page-memo'),
   shpora: document.getElementById('page-shpora'),
+  comments: document.getElementById('page-comments'),
   news: document.getElementById('page-news')
 };
 
@@ -88,6 +101,7 @@ navButtons.forEach(btn => {
     });
 
     if (page === "news") loadNews();
+    if (page === "comments") loadComments();
   });
 });
 
@@ -267,6 +281,128 @@ newsSearchEl?.addEventListener("input", e => {
     (n.text || "").toLowerCase().includes(q)
   );
   renderNews(filtered);
+});
+
+
+
+// ====================== КОМЕНТАРІ ======================
+const COMMENTS_KEY = "ks251_comments_v1";
+
+const commentForm = document.getElementById("comment-form");
+const commentNameEl = document.getElementById("comment-name");
+const commentTextEl = document.getElementById("comment-text");
+const commentListEl = document.getElementById("comments-list");
+const commentCountEl = document.getElementById("comments-count");
+const commentHintEl = document.getElementById("comment-hint");
+
+function loadCommentsData() {
+  try {
+    const raw = localStorage.getItem(COMMENTS_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCommentsData(arr) {
+  localStorage.setItem(COMMENTS_KEY, JSON.stringify(arr));
+}
+
+function fmtDate(ts) {
+  try {
+    return new Date(ts).toLocaleString("uk-UA", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit"
+    });
+  } catch {
+    return "";
+  }
+}
+
+function renderComments(comments) {
+  if (!commentListEl) return;
+
+  commentListEl.innerHTML = "";
+
+  if (!comments.length) {
+    const empty = document.createElement("div");
+    empty.className = "memo-card";
+    empty.innerHTML = `
+      <div class="info-badge">Коментарі</div>
+      <div class="info-title">Поки пусто</div>
+      <div class="info-text">Будь першим, хто напише щось нормальне 😄</div>
+    `;
+    commentListEl.appendChild(empty);
+  } else {
+    comments
+      .slice()
+      .sort((a, b) => (b.ts || 0) - (a.ts || 0))
+      .forEach((c) => {
+        const card = document.createElement("div");
+        card.className = "memo-card comment-card";
+
+        const name = (c.name || "Анонім").toString().slice(0, 32);
+        const text = (c.text || "").toString().slice(0, 500);
+        const date = fmtDate(c.ts);
+
+        card.innerHTML = `
+          <div class="comment-meta">
+            <span>${name}</span>
+            <span>${date}</span>
+          </div>
+          <div class="info-text">${text.replace(/\n/g, "<br/>")}</div>
+          <button class="comment-delete" title="Видалити">🗑</button>
+        `;
+
+        const delBtn = card.querySelector(".comment-delete");
+        delBtn?.addEventListener("click", () => {
+          const now = loadCommentsData();
+          const filtered = now.filter(x => x.id !== c.id);
+          saveCommentsData(filtered);
+          renderComments(filtered);
+        });
+
+        addParallax(card);
+        commentListEl.appendChild(card);
+      });
+  }
+
+  if (commentCountEl) {
+    const n = comments.length;
+    commentCountEl.textContent = `${n} коментар${n === 1 ? "" : (n < 5 ? "і" : "ів")}`;
+  }
+}
+
+function loadComments() {
+  const data = loadCommentsData();
+  renderComments(data);
+}
+
+commentForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = commentNameEl?.value.trim();
+  const text = commentTextEl?.value.trim();
+
+  if (!text) {
+    if (commentHintEl) commentHintEl.textContent = "Напиши хоч щось 🙂";
+    return;
+  }
+
+  const comments = loadCommentsData();
+  comments.push({
+    id: crypto?.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+    name: name || "Анонім",
+    text,
+    ts: Date.now()
+  });
+
+  saveCommentsData(comments);
+  if (commentHintEl) commentHintEl.textContent = "Збережено ✅";
+
+  if (commentTextEl) commentTextEl.value = "";
+  loadComments();
 });
 
 // грузим один раз при старте (на всякий)
