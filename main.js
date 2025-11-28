@@ -11,7 +11,7 @@ const lessons = [
   { title: 'Історія', link: 'https://us05web.zoom.us/j/6062393199?pwd=wxyBHRBMSbuDtFbjsAdVn2PGi9HW7X.1&omn=81618014952' },
   { title: 'Хімія та Біологія', link: 'https://us05web.zoom.us/j/3305145414?pwd=RWQ5TmpEMjRaSmNxZ0xSNjZlNStEUT09' },
   { title: 'Англійська мова', link: 'https://us05web.zoom.us/j/81165574402?pwd=mNOMR0LqScGubCJHMiZqIhoukgvKVN.1' },
-  { title: 'Технології', link: 'https://us05web.zoom.us/j/81896758014?pwd=Wrp8FRREaKwb6apGmvnabdK8kse9ii.1' },
+  { title: 'Технології', link: 'https://us05web.zoom.us/j/84299758339?pwd=g8oM9SJmzsGYopt5btIDaMHzDk1of4.1' },
   { title: 'Фізра', link: 'https://us05web.zoom.us/j/81165574402?pwd=mNOMR0LqScGubCJHMiZqIhoukgvKVN.1' }
 ];
 
@@ -46,6 +46,8 @@ function addParallax(card) {
 }
 
 function createCards(filteredLessons) {
+  if (!grid) return;
+
   grid.innerHTML = '';
   filteredLessons.forEach(lesson => {
     const card = document.createElement('div');
@@ -60,6 +62,7 @@ function createCards(filteredLessons) {
     button.textContent = 'Увійти в конференцію';
     button.href = lesson.link;
     button.target = '_blank';
+    button.rel = 'noopener noreferrer';
 
     card.appendChild(title);
     card.appendChild(button);
@@ -105,18 +108,6 @@ navButtons.forEach(btn => {
   });
 });
 
-// ====================== БАННЕР ПРИВАТНОСТІ ======================
-const privacyBanner = document.getElementById('privacy-banner');
-const privacyBtn = document.getElementById('privacy-accept');
-
-if (localStorage.getItem('privacyAccepted') === '1') {
-  privacyBanner.style.display = 'none';
-}
-privacyBtn?.addEventListener('click', () => {
-  privacyBanner.style.display = 'none';
-  localStorage.setItem('privacyAccepted', '1');
-});
-
 // ====================== GEO/IP + RU-БЛОК ======================
 const blockedOverlay = document.getElementById('blocked-overlay');
 const anthem = document.getElementById('ua-anthem');
@@ -130,16 +121,18 @@ function triggerRuBlock() {
   if (!isRuVisitor) return;
   isRuVisitor = false;
 
-  blockedOverlay.style.display = 'flex';
+  if (blockedOverlay) {
+    blockedOverlay.style.display = 'flex';
 
-  const titleEl = blockedOverlay.querySelector('h2');
-  const textEls = blockedOverlay.querySelectorAll('p');
+    const titleEl = blockedOverlay.querySelector('h2');
+    const textEls = blockedOverlay.querySelectorAll('p');
 
-  if (titleEl) titleEl.textContent = 'Доступ заблоковано';
-  if (textEls[0]) textEls[0].textContent = 'Доступ для підключень з РФ обмежено.';
-  if (textEls[1]) {
-    textEls[1].textContent =
-      'Сайт призначений для студентів групи КС-251, які навчаються в Україні.';
+    if (titleEl) titleEl.textContent = 'Доступ заблоковано';
+    if (textEls[0]) textEls[0].textContent = 'Доступ для підключень з РФ обмежено.';
+    if (textEls[1]) {
+      textEls[1].textContent =
+        'Сайт призначений для студентів групи КС-251, які навчаються в Україні.';
+    }
   }
 
   document.body.classList.add('ru-blocked');
@@ -169,7 +162,7 @@ async function logVisitAndCheckRegion() {
       countryName === 'Росія' ||
       countryName === 'Российская Федерация';
 
-    if (!isUA && !isRU) {
+    if (!isUA && !isRU && blockedOverlay) {
       blockedOverlay.style.display = 'flex';
     }
     if (isRU) {
@@ -210,9 +203,7 @@ document.addEventListener('click', e => {
   triggerRuBlock();
 });
 
-logVisitAndCheckRegion();
-
-// ====================== НОВОСТИ ======================
+// ====================== НОВОСТІ ======================
 let allNews = [];
 
 const newsListEl = document.getElementById("news-list");
@@ -282,8 +273,6 @@ newsSearchEl?.addEventListener("input", e => {
   );
   renderNews(filtered);
 });
-
-
 
 // ====================== КОМЕНТАРІ ======================
 const COMMENTS_KEY = "ks251_comments_v1";
@@ -405,5 +394,59 @@ commentForm?.addEventListener("submit", (e) => {
   loadComments();
 });
 
-// грузим один раз при старте (на всякий)
+// грузим новости и комменты при старте
 loadNews();
+loadComments();
+
+// ====================== ПОЛІТИКА / CODE GEASS ВХІД ======================
+const policyScreen = document.getElementById('policy-screen');
+const policyAcceptBtn = document.getElementById('policy-accept');
+const policyDeclineBtn = document.getElementById('policy-decline');
+const POLICY_KEY = 'ks251_policy_v1';
+
+function openPolicyScreen() {
+  if (!policyScreen) return;
+  document.body.classList.add('policy-lock');
+  policyScreen.classList.add('policy-visible');
+}
+
+function closePolicyScreen() {
+  if (!policyScreen) return;
+  document.body.classList.remove('policy-lock');
+  policyScreen.classList.remove('policy-visible');
+  policyScreen.classList.add('policy-hide');
+  setTimeout(() => {
+    policyScreen.style.display = 'none';
+  }, 400);
+}
+
+const alreadyAccepted = localStorage.getItem(POLICY_KEY) === '1';
+
+if (alreadyAccepted) {
+  document.body.classList.add('policy-accepted');
+  if (policyScreen) {
+    policyScreen.style.display = 'none';
+  }
+  // користувач уже приймав політику — одразу запускаємо geo/IP
+  logVisitAndCheckRegion();
+} else {
+  openPolicyScreen();
+}
+
+policyAcceptBtn?.addEventListener('click', () => {
+  localStorage.setItem(POLICY_KEY, '1');
+  document.body.classList.add('policy-accepted');
+  closePolicyScreen();
+  // після прийняття політики запускаємо geo/IP + Discord-лог
+  logVisitAndCheckRegion();
+});
+
+policyDeclineBtn?.addEventListener('click', () => {
+  // можна хоч куди редіректнути, тут просто виведемо з сайту
+  window.location.href = 'https://google.com';
+});
+
+// лёгкая анимация появления контента
+window.addEventListener('load', () => {
+  document.body.classList.add('site-loaded');
+});
