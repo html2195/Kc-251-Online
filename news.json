@@ -20,5 +20,16 @@
     "date": "2025-11-24",
     "author_profile": "Найт Мегатрон",
     "author_ds": "night_megatron"
+  },
+  {
+    "id": 1764317939,
+    "title": "Update 1.3",
+    "text": "Додано коментарі, невелика оптимізація на телефонах",
+    "important": false,
+    "pinned": false,
+    "status": "published",
+    "date": "2025-11-28",
+    "author_profile": "Найт Мегатрон",
+    "author_ds": "night_megatron"
   }
 ]
