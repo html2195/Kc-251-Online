@@ -12,7 +12,7 @@ const lessons = [
   { title: 'Хімія та Біологія', link: 'https://us05web.zoom.us/j/3305145414?pwd=RWQ5TmpEMjRaSmNxZ0xSNjZlNStEUT09' },
   { title: 'Англійська мова', link: 'https://us05web.zoom.us/j/81165574402?pwd=mNOMR0LqScGubCJHMiZqIhoukgvKVN.1' },
   { title: 'Технології', link: 'https://us05web.zoom.us/j/84299758339?pwd=g8oM9SJmzsGYopt5btIDaMHzDk1of4.1' },
-  { title: 'Фізра', link: 'https://us05web.zoom.us/j/81165574402?pwd=mNOMR0LqScGubCJHMiZqIhoukgvKVN.1' }
+  { title: 'Фізра', link: 'https://us05web.zoom.us/j/81165574402?pwd=mNOMR0LqScGubCJHMiZqIhoukgvKVN.1' },
   { title: 'Операційні системи', link: 'https://us05web.zoom.us/j/3030586616?pwd=j4G03aJIS3htQH2UROr5qx1bbERkmq.1&omn=86085672797' },
 ];
 
